@@ -10,6 +10,8 @@ import pandas as pd
 
 #read the data
 df = pd.read_csv('DataAnalyst.csv')
+#drop n/a NaN rows, 1 row is removed from 2252 rows 
+df = df.dropna()
 
 #--------------------------------------------salary
 #original data: $37K-$66K (Glassdoor est.)
@@ -56,7 +58,12 @@ df['Company_Name_Text'] = df.apply(lambda x:
                                    else x['Company Name'][:-3], 
                                    axis = 1)
     
-#-----------------------------------------------state location
+
+    
+#remove the new line character
+df['Company_Name_Text'] = df.Company_Name_Text.apply(lambda x: x.replace('\n', ''))
+
+#-----------------------------------------------state of location
 #Location: Fairfield, NJ
 #State: NJ
 #Headquarter_Position: =1 if this position is at Headquarters else =0
@@ -108,17 +115,6 @@ df['Excel'] = df['Job Description'].apply(lambda x:
                                            else 0)
 #df.Excel.value_counts()
 
-df['GitHub'] = df['Job Description'].apply(lambda x: 
-                                           1 
-                                           if 'github' in x.lower()
-                                           else 0)
-#df.GitHub.value_counts()
-
-df['Visualization'] = df['Job Description'].apply(lambda x: 
-                                           1 
-                                           if 'visualization' in x.lower()
-                                           else 0)
-#df.Visualization.value_counts()
 
 df['Machine_Learning'] = df['Job Description'].apply(lambda x: 
                                            1 
@@ -126,9 +122,89 @@ df['Machine_Learning'] = df['Job Description'].apply(lambda x:
                                            else 0)
 #df.Machine_Learning.value_counts()
 
+df['Tableau'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'tableau' in x.lower()
+                                           else 0)
+#df.Tableau.value_counts()
+
+df['AWS'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'aws' in x.lower()
+                                               or 'amazon web services' in x.lower()
+                                           else 0)
+#df.AWS.value_counts()
+
+df['Spark'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'spark' in x.lower()
+                                           else 0)
+#df.Spark.value_counts()
+
+df['Google_Analytics'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'google analytics' in x.lower()
+                                           else 0)
+#df.Google_Analytics.value_counts()
+
+df['Power_BI'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'powerbi' in x.lower()
+                                           else 0)
+#df.Power_BI.value_counts()
+
+df['Big_Query'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'bigquery' in x.lower()
+                                           else 0)
+#df.Big_Query.value_counts()
+
+df['Looker'] = df['Job Description'].apply(lambda x: 
+                                           1 
+                                           if 'looker' in x.lower()
+                                           else 0)
+#df.Looker.value_counts()
+
+#------------------------------------------------job titles
+def Title_simplifier(title):
+    if 'data scientist' in title.lower():
+        return 'data scientist'
+    elif 'data engineer' in title.lower():
+        return 'data engineer'
+    elif 'analyst' in title.lower():
+        return 'analyst'
+    elif 'machine learning' in title.lower():
+        return 'mle'
+    elif 'manager' in title.lower():
+        return 'manager'
+    elif 'director' in title.lower():
+        return 'director'
+    else:
+        return 'na'
+    
+    
+df['Job_Simp'] = df['Job Title'].apply(Title_simplifier)
+#df.Job_simp.value_counts()
+    
+#------------------------------------------------seniority
+def Seniority(title):
+    if 'sr' in title.lower() or 'senior' in title.lower() or 'sr' in title.lower() or 'lead' in title.lower() or 'principal' in title.lower():
+            return 'senior'
+    elif 'jr' in title.lower() or 'jr.' in title.lower():
+        return 'jr'
+    else:
+        return 'na'
+    
+df['Seniority'] = df['Job Title'].apply(Seniority)
+#df.Seniority.value_counts()
+
+#------------------------------------------------num of competitors
+df['Num_Comp'] = df['Competitors'].apply(lambda x: len(x.split(',')) if x != '-1' else 0)
+#df.Num_Comp.value_counts()
+
 #---------------------------------------------remove useless 1st col
 #df.columns() --> names of all col
-df_cleaned = df.drop(['Unnamed: 0'], axis = 1)
+df_cleaned = df.drop(['Unnamed: 0'], axis = 1)  
 
 #---------------------------------------------output
 #index = False to avoid the indes col
